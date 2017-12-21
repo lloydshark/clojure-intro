@@ -1,0 +1,10 @@
+abby,15,cancer
+barbara,35,leo
+carol,67,capricorn
+dean,25,taurus
+edward,12,pisces
+fred,85,virgo
+george,5,aries
+harry,17,sagittarius
+irma,40,cancer
+jack,9,capricorn
