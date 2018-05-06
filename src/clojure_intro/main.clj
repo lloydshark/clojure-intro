@@ -1,5 +1,5 @@
 (ns clojure-intro.main
-  (:require [clojure-intro.web-app :as web-app])
+  (:require [clojure-intro.http-server :as web-app])
   (:gen-class))
 
 (defn -main [ & args]

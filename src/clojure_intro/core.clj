@@ -1,30 +1,57 @@
 (ns clojure-intro.core
   (:import (java.util Date UUID)))
 
-;; Clojure - Sameness everywhere.
+;; ----------------------------------------------------------------------------------------------------------------
+;; Clojure - "Sameness everywhere".
 ;;
 ;; "A language that doesn't affect the way you think about programming, is not worth knowing." - Alan Perlis.
 ;;
-;; Learning: Clojure not wacky, not academic - I could build something in that.
+;; What am I Learning? Clojure is not wacky, not academic - come away thinking "yes, I could build something in that".
+;;
+;; Context:
 ;;
 ;; LISP second oldest programming language. Wikipedia says 1958.
 ;; As such many of the concepts in computer science started in LISP.
 ;;
-;; Clojure - A general purpose language with a emphasis of simplicity.
+;; Clojure - A general purpose language with a emphasis (and culture) of simplicity.
 ;;
-;; Clojure 2007 - on the JVM. ClojureScript 2010 - a js cross compiler.
+;; Clojure 2007 - on the JVM. ClojureScript 2010 - a javascript cross compiler.
 ;;
-;; Rich Hickey describes it as an opinionated language. That's hard to pin down, but I think
+;; Rich Hickey (the Clojure inventor) describes it as an opinionated language. That's hard to pin down, but I think
 ;; it refers to the immutable data structures and some of the core library semantics.
 ;;
-
-
-;; Basic Data types / Data structures / Syntax... Immutable.
 ;;
-;; Learning: There's a simple readable syntax for defining the data structures of Clojure.
-;;           And there is a REPL for you to explore them. Read Eval Print Loop.
-;;           Everything needs to be defined in lexical order. ie Can't refer to something
-;;           That doesn't exist yet.
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 0. Getting Started.
+;;
+;; What am I learning? It's not complicated to setup.
+;;                     And if you are a Java developer its really not a big step.
+;;
+;; https://clojure.org/
+;;
+;; On Mac:
+;; brew install clojure
+;;
+;; Linux:
+;; curl -O https://download.clojure.org/install/linux-install-1.9.0.375.sh
+;;
+;; This talk is presented using IntelliJ plus Cursive plugin.
+;;
+;; And this project itself uses the leiningen project / build tools.
+;;
+;; ----------------------------------------------------------------------------------------------------------------
+
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 1. Basic Data types / Data structures.
+;;
+;; What am I Learning? There's a simple readable syntax for defining the data structures of Clojure.
+;;                     And there is a REPL for you to explore them. Read Eval Print Loop.
+;;                     Everything needs to be defined in lexical order.
+;;                     ie Can't refer to something that doesn't exist yet.
+;; ----------------------------------------------------------------------------------------------------------------
+
 
 ;; number
 27
@@ -47,18 +74,14 @@ nil
 
 ;; keyword (symbolic identifier, fast lookups)
 :banana
-(keyword "banana")
 
-;; symbol (often not created explicitly).
-'fred
-(symbol "fred")
+;; symbol (typically not created explicitly, we'll talk about it later).
+'banana
 
 ;; A list
-(list 1 2 3 4)
 '(1 2 3 4)
 
 ;; vector
-(vector 1 2 3 4)
 [1 2 3 4]
 
 ;; set
@@ -83,62 +106,93 @@ nil
  :children [{:name "Sam"
              :age   6}]}
 
+;; Regular Expression
+#"^The (.+) brown fox$"
 
 
-;; "Global" Variables (values) in this namespace
+;; ----------------------------------------------------------------------------------------------------------------
+;; 2. "Global" Variables (values) in this namespace.
 ;;
+;; What am I learning?
+;;
+;; - Convention, kebab-case for names rather than say Camel.
+;; - This is analogous to "public static final" in a Java Class.
+;; ----------------------------------------------------------------------------------------------------------------
+
+;; A Vector of fruit names.
+(def fruit ["apple" "orange" "banana" "pineapple"])
+
+;; A Map ie Thing with properties & values. In Java say a DTO / simple bean.
+(def example-person {:name "jack"
+                     :age  43})
+
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 3. Calling Functions...
+;;
+;; Function name is first in the list, then the parameters (Polish Notation).
+;;
+;; What am I learning?
+;;
+;; - Don't be afraid, just move the bracket to the left :)
 ;;
 
-(def fruit ["apple" "orange" "banana" "kettle"])
+(+ 1 2) ;; 1 + 2
 
-(def a-person {:name "jack"
-               :age 43})
+(first fruit) ;; fruit.first()
+
+(get example-person :name)  ;; example-person.get(:name)
 
 
-;; Defining Functions...
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 4. Define our own Functions...
 ;;
-;; Always returns a value (the last value of the function).
+;; They always returns a value (the last value of the function). No explicit "return" statement.
 ;; Yes the brackets have to match. :)
 ;;
-;; Learning: They're just the same (lists / vectors etc),
-;; no new sytax to learn.
+;; What am I Learning? They're just the same (lists / vectors etc),
+;;                     no new syntax to learn.
+;;                     Zero magic, where possible pure functions.
 ;;
 
-;; Normal...
+;; Normal... One parameter function.
 (defn add-one [number]
   (+ 1 number))
-
-(defn add-two-numbers [one two & rest]
-  (+ one two))
-
-
 
 ;; Anonymous...
 (fn [number] (+ 1 number))
 
-;; Super Compact Anonymous version.
+;; Super Compact Anonymous version...
 #(+ 1 %)
 
 
-;; Calling Functions...
-;;
-;; function name is first in the list.
-;;
-;; Learning: Just move the bracket to the left :)
-;;
+(add-one 2) ;; 3
 
-(add-one 2)
+;; Multiple Parameters...
+(defn add-numbers [first-number second-number]
+  (+ first-number second-number))
+
+(add-numbers 1 2) ;; 3
+
+;; Variable Parameters...
+(defn add-lots-of-numbers [first-number second-number & other-numbers]
+  (+ first-number second-number (apply + other-numbers)))
+
+(add-lots-of-numbers 10 2 3 15) ;; 30
 
 
-;; Identity, Values. Immutable.
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 5. Identity, Values. Immutability.
 ;;
-;; Learning: Persistent Data structures.
+;; What am I Learning? Persistent Data structures.
 ;;
-;; No more writing toString or hashCode. Equals is Equals.
-;; Functions operate on pure printable data.
-;; When debugging you can worry about pure immutable printable.
-;; Tests care about pure printable data.
-;; No data is "changed" underneath you.
+;; - No more writing toString, hashCode, clone, deepEquals EQUALS is EQUALS is "="
+;; - Your functions operate on pure immutable printable data.
+;; - When debugging you only need to worry about pure immutable printable data.
+;; - Your tests only need to care about pure immutable printable data.
+;; - No data is "changed" underneath you.
 ;;
 
 (def fred {:name "fred"
@@ -154,12 +208,16 @@ nil
              :star-sign "capricorn"})
 
 (def twin {:name "steven"
-             :age  12
-             :star-sign "capricorn"})
+           :age  12
+           :star-sign "capricorn"})
 
 (def carol {:name "carol"
             :age  15
             :star-sign "taurus"})
+
+;; Equals is Equals, same data means equals is true.
+
+(= steven twin) ;; true
 
 
 ;; Access / "Change" a List...
@@ -169,6 +227,7 @@ nil
 
 (conj all-people carol)
 
+;; The original list didn't change.
 all-people
 
 
@@ -183,26 +242,32 @@ fred
 
 (dissoc fred :age)
 
+;; Original fred didn't change.
 fred
 
 
-;; Analogy Flow vs Message Sending...
+;; Discussion: Analogy "Flow" vs "Message Sending"...
 ;;
-;; The thing is in the OO world, I became very used to modeling the world as Objects
+;; In the Object Oriented world, I became very used to modeling the world as Objects
 ;; and then seeing my application as a series of messages between objects.
-;; The bad version is gunfight at the ok corral.
+;; I became very good at it and thought this was THE way.
+;;
+;; But the bad version is gunfight at the ok corral. With messages (bullets flying everywhere).
 ;;
 ;; With immutable data in a functional world, I now see the code more like a
 ;; river flowing.  ie It starts somewhere and transforms along the way.
-
-
-
-;; Now that we know how to call a function - lets try out some of the core data structures
-;; and core functions.
-;; Learning - Sameness Everywhere for sequences. No need to learn different functions.
 ;;
 
-(def fruit-list (list "apple" "orange" "banana" "kettle"))
+
+
+;; ----------------------------------------------------------------------------------------------------------------
+;; 6. Now that we know how to call a function - lets try out some of the core data structures
+;; and core functions.
+
+;; What am I Learning: Sameness Everywhere for sequences. No need to learn different functions for different behaviour.
+;;
+
+(def fruit-list (list "apple" "orange" "banana" "pineapple"))
 
 ;; List...
 (first fruit-list)
@@ -211,7 +276,7 @@ fred
 (nth fruit-list 3)
 (count fruit-list)
 
-(def fruit-vector ["apple" "orange" "banana" "kettle"])
+(def fruit-vector ["apple" "orange" "banana" "pineapple"])
 
 ;; Vector...
 (first fruit-vector)
@@ -240,7 +305,14 @@ fred
 
 
 
-;; Basic Algorithms / Logic / Flow of Control...
+;; ----------------------------------------------------------------------------------------------------------------
+;; 7. Basic Algorithms...
+;;
+;; The question mark here is just a convention - it has no special significance.
+;;
+;; Basic Logic If Else
+;; Map / Filter / Reduce
+;; Cond / Switch
 
 (defn adult? [person]
   (<= 18 (:age person)))
@@ -250,10 +322,6 @@ fred
     (format "%s is an adult." (:name person))
     (format "%s is a child." (:name person))))
 
-(defn add-age [total person]
-  (+ total (:age person)))
-
-
 (comment
 
   (describe-person fred)
@@ -261,18 +329,25 @@ fred
   ;; Find the adults...
   (filter adult? all-people)
 
-  ;; Calculator the total ages...
-  (reduce add-age 0 all-people)
-
   ;; Find all the names....
   (map :name all-people)
+
+  ;; Sum the total age of all the people...
+  (reduce (fn [total person] (+ total (:age person)))
+          0
+          all-people
+          )
 
   )
 
 
-;; Readability / nil safety / truthy...
+;; ----------------------------------------------------------------------------------------------------------------
+;; 8. Readability / nil safety / truthy...
 ;;
-;; Learning: Less Code, less fragility.
+;; What am I learning?
+;;
+;;- Less Code, less fragility.
+;;
 
 (map :name nil)
 
@@ -292,7 +367,8 @@ fred
 (and 4 6)
 
 
-;; Nice Libraries...
+;; ----------------------------------------------------------------------------------------------------------------
+;; 9. Nice Libraries...
 ;;
 ;; Learning: Nice abstractions means compact code. Low cruft.
 ;; (and I don't mean cryptic compact).
@@ -305,7 +381,6 @@ fred
     {:name      (nth columns 0)
      :age       (nth columns 1)
      :star-sign (nth columns 2)})
-  ;(zipmap (list :name :age :star-sign) (clojure.string/split line #","))
   )
 
 (defn read-people-from-file [file-path]
@@ -337,8 +412,7 @@ fred
 
   )
 
-;;
-;; Learning:  What is our job if not often to take one form of data and transform it
+;; What am I learning:  What is our job if not often to take one form of data and transform it
 ;; to another in order to achieve the business function.
 ;; Here we have immutable data (values) and a range of functions that facilitate
 ;; that manipulation with (hopefully) very few movements.
@@ -349,7 +423,14 @@ fred
 
 
 
-;; Java Interop
+;; ---------------------------------------------------------------------------------------------------------------
+;; 10. Java Interop
+;;
+;; What am I learning?
+;;
+;; - Yes, you can still rely on well known / battle tested Java libraries.
+;;
+
 
 ;; Special Syntax for creating a new instance...
 (def current-date (Date.))
@@ -360,13 +441,18 @@ fred
 ;; Static Method...
 (System/currentTimeMillis)
 
-(-> (UUID/randomUUID) .toString)
+(.toString (UUID/randomUUID))
 
 
-
-;; But what if I do have some state...
+;; ---------------------------------------------------------------------------------------------------------------
+;; 11. But what if I do have some state.
 ;;
-;; Learning: Simple concurrency is straight forward (STM).
+;; In clojure one of the main mechanisms for managing state in a controlled way is called and atom.
+;;
+;; What am I learning?
+;;
+;; - If you do have a need for "mutable" state - then there is a mechanism for this.
+;; - Basic concurrency is straight forward.
 ;;
 
 (defonce people-by-id (atom {}))
@@ -403,12 +489,12 @@ fred
   )
 
 
-
-;; Polymorphism et al
+;; ---------------------------------------------------------------------------------------------------------------
+;; 12. Polymorphism et al
 ;;
 ;; defmulti, defprotocol, defrecord, refify.
 ;;
-;; Learning: You can still have polymorphic dispatch. But disconnected from Object heirarchies.
+;; What am I learning: You can still have polymorphic dispatch. But disconnected from Object hierarchies.
 ;;
 
 (defmulti notification
@@ -458,9 +544,10 @@ fred
 ;; but wish to insert a Dummy implementation for unit / integration testing purposes.
 
 
-;; Macros...
+;; ---------------------------------------------------------------------------------------------------------------
+;; 13. Macros...
 ;;
-;; Maliability of the language. You can easily extend the language if it suits.
+;; Malleability of the language. You can easily extend the language if it suits.
 ;;
 ;; But nothing new here the macro works on manipulating existing Clojure data structures.
 ;;
@@ -485,9 +572,18 @@ fred
 ;  (do (println "++++++++")
 ;      (println (describe-person fred))
 ;      (println "++++++++")))
+;
+; You'd think "when" is something in the language - in actual fact it is just a macro which at "read"
+; time is converted to "if" and "do".
+;
+; What am I learning? That you can extend the language as you see fit if you want to and provide new
+; features if it makes sense for your application.
 
 
 
 ;; So what are the downsides...
 ;;
-;;
+;; - No dominant frameworks.
+;; - Some styles of problems perhaps it doesn't suit.
+;; - FUD
+;; - Smaller Community

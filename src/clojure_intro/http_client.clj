@@ -1,4 +1,4 @@
-(ns clojure-intro.http
+(ns clojure-intro.http_client
   (:require [cheshire.core :as json]
             [clj-http.client :as client]))
 
@@ -13,7 +13,8 @@
 
   (client/get "http://localhost:3000/list-people")
 
-  (map :name (fetch-people))
+  (fetch-people)
 
+  (map :name (fetch-people))
 
   )

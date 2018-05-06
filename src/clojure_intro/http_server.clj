@@ -1,4 +1,4 @@
-(ns clojure-intro.web-app
+(ns clojure-intro.http-server
   (:require [ring.adapter.jetty :as jetty]
             [cheshire.core :as json]
             [clojure-intro.core :as core]))
@@ -9,18 +9,12 @@
    :headers {"Content-Type" "application/json"}
    :body    (json/generate-string (core/list-people))})
 
-;(defn list-names-request-handler [_]
-;  {:status  200
-;   :headers {"Content-Type" "application/json"}
-;   :body    (json/generate-string (core/list-names))})
-
 (defn not-found-request-handler [_]
   {:status 404})
 
 (def routes
   {
    "/list-people" list-people-request-handler
-   ;"/list-names"  list-names-request-handler
    })
 
 (defn find-request-handler [request]
@@ -38,6 +32,8 @@
 (comment
 
   (def my-server (start-server))
+
+  (.stop my-server)
 
   (core/add-person core/mary)
 
