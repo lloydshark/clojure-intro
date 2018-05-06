@@ -6,3 +6,13 @@
   (println "Starting..." args)
   (web-app/start-server)
   (println "Startup Completed."))
+
+
+;; lein uberjar
+;;
+;; (main above is defined via project.clj)
+;;
+;; cd target
+;;
+;; java -jar clojure-intro-XYZ-standalone.jar
+;;
