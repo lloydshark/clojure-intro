@@ -1,10 +1,11 @@
-abby,15,cancer
-barbara,35,leo
-carol,67,capricorn
-dean,25,taurus
-edward,12,pisces
-fred,85,virgo
-george,5,aries
-harry,17,sagittarius
-irma,40,cancer
-jack,9,capricorn
+abby,15,Tasmania
+barbara,35,Victoria
+carol,67,Queensland
+dean,25,South Australia
+edward,12,New South Wales
+fred,85,Tasmania
+george,5,Victoria
+harry,17,Queensland
+irma,40,Victoria
+jack,9,Victoria
+fred,27,Victoria

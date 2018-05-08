@@ -21,7 +21,7 @@
   (get routes (:uri request) not-found-request-handler))
 
 (defn handler [request]
-  (println request)
+  (println request) ;; It's just a Map...
   ((find-request-handler request) request))
 
 (defn start-server []
@@ -33,11 +33,11 @@
 
   (def my-server (start-server))
 
-  (.stop my-server)
-
   (core/add-person core/mary)
 
   (core/list-people)
+
+  (.stop my-server)
 
   )
 

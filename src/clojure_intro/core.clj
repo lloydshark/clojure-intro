@@ -1,4 +1,5 @@
 (ns clojure-intro.core
+  (:require [cheshire.core :as json])
   (:import (java.util Date UUID)))
 
 ;; ----------------------------------------------------------------------------------------------------------------
@@ -17,8 +18,9 @@
 ;;
 ;; Clojure 2007 - on the JVM. ClojureScript 2010 - a javascript cross compiler.
 ;;
-;; Rich Hickey (the Clojure inventor) describes it as an opinionated language. That's hard to pin down, but I think
-;; it refers to the immutable data structures and some of the core library semantics.
+;; Rich Hickey (the Clojure inventor) describes it as an "opinionated" language.
+;; That's hard to pin down, but I think it refers to the immutable data structures and some of
+;; the core library semantics.
 ;;
 ;;
 
@@ -40,16 +42,18 @@
 ;;
 ;; And this project itself uses the leiningen project / build tools.
 ;;
+;; So, lets open a REPL on this namespace.
+;;
 ;; ----------------------------------------------------------------------------------------------------------------
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 1. Basic Data types / Data structures.
 ;;
-;; What am I Learning? There's a simple readable syntax for defining the data structures of Clojure.
-;;                     And there is a REPL for you to explore them. Read Eval Print Loop.
-;;                     Everything needs to be defined in lexical order.
-;;                     ie Can't refer to something that doesn't exist yet.
+;; What am I Learning?
+;;
+;; - There's a simple readable syntax for defining the data structures of Clojure.
+;; - And there is a REPL for you to explore them. Read Eval Print Loop.
 ;; ----------------------------------------------------------------------------------------------------------------
 
 
@@ -72,11 +76,8 @@ nil
 ;; string
 "the quick brown fox"
 
-;; keyword (symbolic identifier, fast lookups)
+;; keyword (symbolic identifier, fast look-ups, always starts with a colon)
 :banana
-
-;; symbol (typically not created explicitly, we'll talk about it later).
-'banana
 
 ;; A list
 '(1 2 3 4)
@@ -91,16 +92,12 @@ nil
 {:name "fred"
  :age  27}
 
-{:name "fred"
- :age  27
- :star-sign "taurus"}
-
 ;; Any key or value
 {1        "fred"
  :this    nil
  "my-key" 234M}
 
-;; Maps in Maps
+;; Maps in Maps (and any level).
 {:name "fred"
  :age  27
  :children [{:name "Sam"
@@ -109,23 +106,29 @@ nil
 ;; Regular Expression
 #"^The (.+) brown fox$"
 
+;; symbol (typically not created explicitly, we'll talk about it later).
+'banana
+
 
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 2. "Global" Variables (values) in this namespace.
 ;;
 ;; What am I learning?
 ;;
-;; - Convention, kebab-case for names rather than say Camel.
+;; - Convention, kebab-case for names rather than say Camel in Java.
 ;; - This is analogous to "public static final" in a Java Class.
 ;; ----------------------------------------------------------------------------------------------------------------
 
 ;; A Vector of fruit names.
 (def fruit ["apple" "orange" "banana" "pineapple"])
 
-;; A Map ie Thing with properties & values. In Java say a DTO / simple bean.
+fruit
+
+;; A Map ie Thing with properties & values.
 (def example-person {:name "jack"
                      :age  43})
 
+example-person
 
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 3. Calling Functions...
@@ -135,6 +138,7 @@ nil
 ;; What am I learning?
 ;;
 ;; - Don't be afraid, just move the bracket to the left :)
+;; - It's just a list data structure where the first item is the function.
 ;;
 
 (+ 1 2) ;; 1 + 2
@@ -154,6 +158,7 @@ nil
 ;; What am I Learning? They're just the same (lists / vectors etc),
 ;;                     no new syntax to learn.
 ;;                     Zero magic, where possible pure functions.
+;;                     Can only define a function in terms of known things. ie Order is important (no magic).
 ;;
 
 ;; Normal... One parameter function.
@@ -173,13 +178,21 @@ nil
 (defn add-numbers [first-number second-number]
   (+ first-number second-number))
 
-(add-numbers 1 2) ;; 3
+(add-numbers 7 12) ;; 19
 
-;; Variable Parameters...
-(defn add-lots-of-numbers [first-number second-number & other-numbers]
-  (+ first-number second-number (apply + other-numbers)))
+;; Order is important
 
-(add-lots-of-numbers 10 2 3 15) ;; 30
+(defn multiply-by-seven [number]
+  (* number 7))
+
+(defn add-one-then-multiply-by-seven [number]
+  (-> (add-one number)
+      (multiply-by-seven)))
+
+; By the way, the -> is what we call the threading macro to make your code more readable.
+;(multiply-by-seven (add-one 5))
+
+(add-one-then-multiply-by-seven 5) ;; 42
 
 
 
@@ -197,31 +210,33 @@ nil
 
 (def fred {:name "fred"
            :age  27
-           :star-sign "taurus"})
+           :state "Victoria"})
+
+(def steven {:name "steven"
+             :age  15
+             :state "Victoria"})
 
 (def mary {:name "mary"
            :age  38
-           :star-sign "leo"})
+           :state "New South Wales"})
 
-(def steven {:name "steven"
-             :age  12
-             :star-sign "capricorn"})
-
-(def twin {:name "steven"
-           :age  12
-           :star-sign "capricorn"})
+(def twin {:name "mary"
+           :age  38
+           :state "New South Wales"})
 
 (def carol {:name "carol"
             :age  15
-            :star-sign "taurus"})
+            :state "Tasmania"})
 
 ;; Equals is Equals, same data means equals is true.
 
-(= steven twin) ;; true
+(= mary twin) ;; true
 
 
 ;; Access / "Change" a List...
-(def all-people (list fred mary steven))
+(def all-people (list fred steven mary))
+
+all-people
 
 (first all-people)
 
@@ -248,23 +263,25 @@ fred
 
 ;; Discussion: Analogy "Flow" vs "Message Sending"...
 ;;
-;; In the Object Oriented world, I became very used to modeling the world as Objects
-;; and then seeing my application as a series of messages between objects.
-;; I became very good at it and thought this was THE way.
-;;
-;; But the bad version is gunfight at the ok corral. With messages (bullets flying everywhere).
+;; In the Object Oriented world, you model the world as Objects
+;; and then see the application as a series of messages between objects.
 ;;
 ;; With immutable data in a functional world, I now see the code more like a
-;; river flowing.  ie It starts somewhere and transforms along the way.
+;; river flowing.  ie A series of transforms along the way.
 ;;
+;; This is not unique to Clojure - but working with clojure you may start
+;; to think this way.
 
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 6. Now that we know how to call a function - lets try out some of the core data structures
 ;; and core functions.
-
-;; What am I Learning: Sameness Everywhere for sequences. No need to learn different functions for different behaviour.
+;;
+;; What am I Learning?
+;;
+;; - Sameness Everywhere for sequences.
+;; - No need to learn different functions for different behaviour.
 ;;
 
 (def fruit-list (list "apple" "orange" "banana" "pineapple"))
@@ -290,18 +307,23 @@ fred
               :picked-time 1513736101854
               :source      :QUEENSLAND})
 
-;; And maps as well !
+;; And Maps...
 (first a-fruit)
 (rest a-fruit)
 (take 2 a-fruit)
 (count a-fruit)
 
-;; And Strings !
+;; And Strings...
 (first "banana")
 (rest "banana")
 (take 2 "banana")
 (nth "banana" 3)
 (count "banana")
+
+;; And a File...
+(with-open [rdr (clojure.java.io/reader "resources/fruit.txt")]
+  (doall
+    (take 2 (line-seq rdr))))
 
 
 
@@ -314,6 +336,7 @@ fred
 ;; Map / Filter / Reduce
 ;; Cond / Switch
 
+;; The question mark here is just a convention - it has no special significance.
 (defn adult? [person]
   (<= 18 (:age person)))
 
@@ -324,6 +347,7 @@ fred
 
 (comment
 
+  ;; Basic if Then Else
   (describe-person fred)
 
   ;; Find the adults...
@@ -337,16 +361,16 @@ fred
           0
           all-people
           )
-
   )
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 8. Readability / nil safety / truthy...
+;; 8. nil safety / truthy...
 ;;
 ;; What am I learning?
 ;;
-;;- Less Code, less fragility.
+;; - The core libraries and data have an approach to nil which seems to typically avoid NPE.
+;; - Truthy values can means Less Code, less fragility.
 ;;
 
 (map :name nil)
@@ -358,6 +382,8 @@ fred
 (get nil :name)
 
 (assoc-in nil [:this :that] 57)
+
+;;
 
 (if nil "truthy" "falsey")
 (if false "truthy" "falsey")
@@ -376,50 +402,56 @@ fred
 ;; Less code -> Less errors ... Can we say that?
 ;;
 
+
+;; File Reading...
+
 (defn parse-person [line]
-  (let [columns (clojure.string/split line #",")]
-    {:name      (nth columns 0)
-     :age       (nth columns 1)
-     :star-sign (nth columns 2)})
-  )
+    (zipmap [:name :age :state] (clojure.string/split line #",")))
 
 (defn read-people-from-file [file-path]
   (with-open [rdr (clojure.java.io/reader file-path)]
     (doall (map parse-person (line-seq rdr)))))
 
-(defn star-sign-histogram [people]
-  (->> (sort-by :star-sign people)
-       (partition-by :star-sign)
-       (map #(vector (:star-sign (first %)) (count %)))))
+(read-people-from-file "resources/people.txt")
 
-(defn output-star-sign-histogram [histogram file-path]
-  (doseq [[star-sign frequency] histogram]
-    (println star-sign)
-    (spit file-path (format "%s,%s\n" star-sign frequency)
-          :append true)))
+;; Group them keyed by State...
 
-(comment
+(->> (read-people-from-file "resources/people.txt")
+     (group-by :state))
 
-  (def people-from-file (read-people-from-file "resources/people.txt"))
+;; How about a Histogram...
 
-  people-from-file
+(->> (read-people-from-file "resources/people.txt")
+     (group-by :state)
+     (map #(hash-map (first %) (count (second %)))))
 
-  (def histogram (star-sign-histogram people-from-file))
+;; Get the Name & Age of the Queensland people and return as json.
 
-  histogram
+(defn queenslander? [person]
+  (= "Queensland" (:state person)))
 
-  (output-star-sign-histogram histogram "out/histogram.csv")
+(->> (read-people-from-file "resources/people.txt")
+     (filter queenslander?)
+     (map #(select-keys % [:name :age]))
+     (json/generate-string))
 
-  )
+;; Serialization / Deserialization (sorta)
+(spit "out/people.edn" (pr-str (read-people-from-file "resources/people.txt")))
 
-;; What am I learning:  What is our job if not often to take one form of data and transform it
-;; to another in order to achieve the business function.
-;; Here we have immutable data (values) and a range of functions that facilitate
-;; that manipulation with (hopefully) very few movements.
-;; Some refer to Clojure as a data orientated language and that it is specially suited
-;; for "data" problems.
+(read-string (slurp "out/people.edn"))
+
+
+
+;; What am I learning?
 ;;
-;; But aren't all our problems "data" problems !
+;; - What is our job if not often to take one form of data and transform it to another
+;;   in order to achieve the business function.
+;; - Here we have immutable data (values) and a range of functions that facilitate
+;;   that manipulation with (hopefully) very few movements.
+;; - Some refer to Clojure as a data orientated language and that it is specially suited
+;;   for "data" problems.
+;;
+;; - But aren't all our problems "data" problems !!!
 
 
 
@@ -447,7 +479,8 @@ fred
 ;; ---------------------------------------------------------------------------------------------------------------
 ;; 11. But what if I do have some state.
 ;;
-;; In clojure one of the main mechanisms for managing state in a controlled way is called and atom.
+;; In clojure one of the main mechanisms for managing state in a controlled way
+;; is the "atom".
 ;;
 ;; What am I learning?
 ;;
@@ -455,36 +488,37 @@ fred
 ;; - Basic concurrency is straight forward.
 ;;
 
-(defonce people-by-id (atom {}))
+(defonce list-of-people (atom (list)))
 
 (defn add-person [person]
-  (let [id (.toString (UUID/randomUUID))]
-    (swap! people-by-id
-           (fn [people]
-             (assoc people id (assoc person :id id))))))
+  (swap! list-of-people
+         (fn [current-list] (conj current-list person))))
 
 (defn list-people []
-  (vals @people-by-id))
+  @list-of-people)
 
 (defn list-names []
   (map :name (list-people)))
 
 (defn clear-people []
-  (reset! people-by-id {}))
+  (reset! list-of-people (list)))
+
 
 (comment
 
-  people-by-id
+  list-of-people
 
-  @people-by-id
-
-  (add-person mary)
+  @list-of-people
 
   (list-people)
 
   (list-names)
 
   (clear-people)
+
+  (add-person mary)
+
+  (add-person fred)
 
   )
 
@@ -585,5 +619,5 @@ fred
 ;;
 ;; - No dominant frameworks.
 ;; - Some styles of problems perhaps it doesn't suit.
-;; - FUD
-;; - Smaller Community
+;; - Its different.
+;;
