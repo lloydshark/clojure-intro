@@ -1,4 +1,4 @@
-(ns clojure-intro.core
+(ns clojure-intro.example
   (:require [cheshire.core :as json])
   (:import (java.util Date UUID)))
 
@@ -7,7 +7,9 @@
 ;;
 ;; "A language that doesn't affect the way you think about programming, is not worth knowing." - Alan Perlis.
 ;;
-;; What am I Learning? Clojure is not wacky, not academic - come away thinking "yes, I could build something in that".
+;; What am I Learning?
+;;
+;; - Clojure is not wacky, not academic - come away thinking "yes, I could build something in that".
 ;;
 ;; Context:
 ;;
@@ -27,10 +29,12 @@
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 0. Getting Started.
 ;;
-;; What am I learning? It's not complicated to setup.
-;;                     And if you are a Java developer its really not a big step.
+;; What am I learning?
 ;;
-;; https://clojure.org/
+;; - It's not complicated to setup.
+;; - And if you are a Java developer its really not a big step.
+;;
+;; https://clojure.org/guides/getting_started
 ;;
 ;; On Mac:
 ;; brew install clojure
@@ -54,6 +58,7 @@
 ;;
 ;; - There's a simple readable syntax for defining the data structures of Clojure.
 ;; - And there is a REPL for you to explore them. Read Eval Print Loop.
+;; - Syntax in Clojure is very simple. Please stop me if think something has special meaning.
 ;; ----------------------------------------------------------------------------------------------------------------
 
 
@@ -110,6 +115,7 @@ nil
 'banana
 
 
+
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 2. "Global" Variables (values) in this namespace.
 ;;
@@ -122,13 +128,12 @@ nil
 ;; A Vector of fruit names.
 (def fruit ["apple" "orange" "banana" "pineapple"])
 
-fruit
-
 ;; A Map ie Thing with properties & values.
+;; example_person example->person !examplePerson +examplePerson
 (def example-person {:name "jack"
                      :age  43})
 
-example-person
+
 
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 3. Calling Functions...
@@ -155,10 +160,11 @@ example-person
 ;; They always returns a value (the last value of the function). No explicit "return" statement.
 ;; Yes the brackets have to match. :)
 ;;
-;; What am I Learning? They're just the same (lists / vectors etc),
-;;                     no new syntax to learn.
-;;                     Zero magic, where possible pure functions.
-;;                     Can only define a function in terms of known things. ie Order is important (no magic).
+;; What am I Learning?
+;;
+;; - They're just the same (lists / vectors etc),
+;; - No new syntax to learn.
+;; - Can only define a function in terms of known things. ie Order is important (no magic).
 ;;
 
 ;; Normal... One parameter function.
@@ -199,7 +205,9 @@ example-person
 ;; ----------------------------------------------------------------------------------------------------------------
 ;; 5. Identity, Values. Immutability.
 ;;
-;; What am I Learning? Persistent Data structures.
+;; What am I Learning?
+;;
+;; - Persistent Data structures.
 ;;
 ;; - No more writing toString, hashCode, clone, deepEquals EQUALS is EQUALS is "="
 ;; - Your functions operate on pure immutable printable data.
@@ -236,8 +244,6 @@ example-person
 ;; Access / "Change" a List...
 (def all-people (list fred steven mary))
 
-all-people
-
 (first all-people)
 
 (conj all-people carol)
@@ -266,7 +272,7 @@ fred
 ;; In the Object Oriented world, you model the world as Objects
 ;; and then see the application as a series of messages between objects.
 ;;
-;; With immutable data in a functional world, I now see the code more like a
+;; With immutable data in a functional world, I like to see the application more like a
 ;; river flowing.  ie A series of transforms along the way.
 ;;
 ;; This is not unique to Clojure - but working with clojure you may start
@@ -387,7 +393,7 @@ fred
 
 (if nil "truthy" "falsey")
 (if false "truthy" "falsey")
-(if nil "truthy" "falsey")
+(if true "truthy" "falsey")
 (if 6 "truthy" "falsey")
 
 (and 4 6)
@@ -414,10 +420,12 @@ fred
 
 (read-people-from-file "resources/people.txt")
 
+
 ;; Group them keyed by State...
 
 (->> (read-people-from-file "resources/people.txt")
      (group-by :state))
+
 
 ;; How about a Histogram...
 
@@ -425,17 +433,17 @@ fred
      (group-by :state)
      (map #(hash-map (first %) (count (second %)))))
 
-;; Get the Name & Age of the Queensland people and return as json.
 
-(defn queenslander? [person]
-  (= "Queensland" (:state person)))
+;; How about access some AWS S3 json...
 
-(->> (read-people-from-file "resources/people.txt")
-     (filter queenslander?)
-     (map #(select-keys % [:name :age]))
-     (json/generate-string))
+(-> (slurp "resources/s3-put-event.json")
+    (json/parse-string)
+    (get-in ["Records" 0 "s3" "object" "key"]))
+
 
 ;; Serialization / Deserialization (sorta)
+;; Not really - but given we have a nice readable syntax its easy to work with.
+;;
 (spit "out/people.edn" (pr-str (read-people-from-file "resources/people.txt")))
 
 (read-string (slurp "out/people.edn"))
@@ -617,7 +625,9 @@ fred
 
 ;; So what are the downsides...
 ;;
-;; - No dominant frameworks.
-;; - Some styles of problems perhaps it doesn't suit.
 ;; - Its different.
+;; - Good community - but smaller.
+;; - No dominant frameworks so can be a bit confusing as to what libraries to use.
+;; - Some styles of problems perhaps it doesn't suit.
+;; - No backed by a big corporate machine.
 ;;

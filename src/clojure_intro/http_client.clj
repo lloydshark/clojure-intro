@@ -8,7 +8,6 @@
     (json/parse-string (:body response) true)))
 
 
-
 (comment
 
   (client/get "http://localhost:3000/list-people")
