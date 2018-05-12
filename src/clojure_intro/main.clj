@@ -1,10 +1,10 @@
 (ns clojure-intro.main
-  (:require [clojure-intro.http-server :as http-server])
+  (:require [clojure-intro.part2 :as part2])
   (:gen-class))
 
 (defn -main [ & args]
   (println "Starting..." args)
-  (http-server/start-server)
+  (part2/start-server)
   (println "Startup Completed."))
 
 

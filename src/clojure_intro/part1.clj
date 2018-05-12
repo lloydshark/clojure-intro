@@ -1,4 +1,4 @@
-(ns clojure-intro.example
+(ns clojure-intro.part1
   (:require [cheshire.core :as json])
   (:import (java.util Date UUID)))
 
@@ -27,12 +27,12 @@
 ;;
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 0. Getting Started.
+;; >> Getting Started
 ;;
 ;; What am I learning?
 ;;
 ;; - It's not complicated to setup.
-;; - And if you are a Java developer its really not a big step.
+;; - And if you are an existing Java developer its really not a big step.
 ;;
 ;; https://clojure.org/guides/getting_started
 ;;
@@ -48,11 +48,13 @@
 ;;
 ;; So, lets open a REPL on this namespace.
 ;;
+;; Read, Eval, Print, Loop. This is a key concept in a LISP.
 ;; ----------------------------------------------------------------------------------------------------------------
 
 
+
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 1. Basic Data types / Data structures.
+;; >> Basic Data types / Data structures
 ;;
 ;; What am I Learning?
 ;;
@@ -84,11 +86,14 @@ nil
 ;; keyword (symbolic identifier, fast look-ups, always starts with a colon)
 :banana
 
-;; A list
+;; vector (fast random access, slow at adding items).
+;;
+[1 2 3 4]
+
+;; A list (slower random access, fast at adding items).
+;;
 '(1 2 3 4)
 
-;; vector
-[1 2 3 4]
 
 ;; set
 #{1 2 3 4}
@@ -117,45 +122,56 @@ nil
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 2. "Global" Variables (values) in this namespace.
+;; >> "Global" Variables (values) in this namespace.
 ;;
 ;; What am I learning?
 ;;
 ;; - Convention, kebab-case for names rather than say Camel in Java.
 ;; - This is analogous to "public static final" in a Java Class.
-;; ----------------------------------------------------------------------------------------------------------------
+;;
 
 ;; A Vector of fruit names.
 (def fruit ["apple" "orange" "banana" "pineapple"])
+
+fruit
 
 ;; A Map ie Thing with properties & values.
 ;; example_person example->person !examplePerson +examplePerson
 (def example-person {:name "jack"
                      :age  43})
 
+example-person
+
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 3. Calling Functions...
+;; >> Calling Functions...
 ;;
 ;; Function name is first in the list, then the parameters (Polish Notation).
 ;;
 ;; What am I learning?
 ;;
-;; - Don't be afraid, just move the bracket to the left :)
+;; - Don't be afraid, just move the bracket to the left :)  function(x) => (function x)
 ;; - It's just a list data structure where the first item is the function.
+;; - These are functions not methods. They are not tied to a Class.
 ;;
 
-(+ 1 2) ;; 1 + 2
+(+ 1 2) ;; 3
 
-(first fruit) ;; fruit.first()
+(first ["x" "y" "z"]) ;; "x"
+                      ;; Get first element of the sequence.
 
-(get example-person :name)  ;; example-person.get(:name)
+(assoc {:name "fred"} :age "23") ;; {:name "fred" :age "23"}
+                                 ;; Add a property and value to the map.
+
+(zipmap [:name :age] ["fred" "23"]) ;; {:name "fred" :age "23"}
+                                    ;; Create a map from keys and values.
+
 
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 4. Define our own Functions...
+;; >> Define our own Functions.
 ;;
 ;; They always returns a value (the last value of the function). No explicit "return" statement.
 ;; Yes the brackets have to match. :)
@@ -165,7 +181,7 @@ nil
 ;; - They're just the same (lists / vectors etc),
 ;; - No new syntax to learn.
 ;; - Can only define a function in terms of known things. ie Order is important (no magic).
-;;
+;; - In a Clojure file the "interesting" functions will be at the bottom.
 
 ;; Normal... One parameter function.
 (defn add-one [number]
@@ -203,7 +219,7 @@ nil
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 5. Identity, Values. Immutability.
+;; >> Identity, Values. Immutability.
 ;;
 ;; What am I Learning?
 ;;
@@ -273,7 +289,7 @@ fred
 ;; and then see the application as a series of messages between objects.
 ;;
 ;; With immutable data in a functional world, I like to see the application more like a
-;; river flowing.  ie A series of transforms along the way.
+;; pipeline or a river flowing.  ie A series of transforms along the way.
 ;;
 ;; This is not unique to Clojure - but working with clojure you may start
 ;; to think this way.
@@ -281,12 +297,11 @@ fred
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 6. Now that we know how to call a function - lets try out some of the core data structures
-;; and core functions.
+;; >> Core Functions and Data Structures behaviour
 ;;
 ;; What am I Learning?
 ;;
-;; - Sameness Everywhere for sequences.
+;; - Sameness everywhere for sequences. And many things are sequences.
 ;; - No need to learn different functions for different behaviour.
 ;;
 
@@ -334,7 +349,7 @@ fred
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 7. Basic Algorithms...
+;; >> Basic Algorithms.
 ;;
 ;; The question mark here is just a convention - it has no special significance.
 ;;
@@ -367,16 +382,18 @@ fred
           0
           all-people
           )
+
+
   )
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 8. nil safety / truthy...
+;; >> nil safety / truthy
 ;;
 ;; What am I learning?
 ;;
 ;; - The core libraries and data have an approach to nil which seems to typically avoid NPE.
-;; - Truthy values can means Less Code, less fragility.
+;; - Truthy values can means less code, less fragility.
 ;;
 
 (map :name nil)
@@ -395,12 +412,14 @@ fred
 (if false "truthy" "falsey")
 (if true "truthy" "falsey")
 (if 6 "truthy" "falsey")
+(if 6 "truthy" "falsey")
+(if 0 "truthy" "falsey")
 
 (and 4 6)
 
 
 ;; ----------------------------------------------------------------------------------------------------------------
-;; 9. Nice Libraries...
+;; >> Nice Libraries...
 ;;
 ;; Learning: Nice abstractions means compact code. Low cruft.
 ;; (and I don't mean cryptic compact).
@@ -442,7 +461,8 @@ fred
 
 
 ;; Serialization / Deserialization (sorta)
-;; Not really - but given we have a nice readable syntax its easy to work with.
+;; Not really - but given we have a nice readable syntax its easy to work with,
+;; it's easily possible to read and write clojure data to and from file(s).
 ;;
 (spit "out/people.edn" (pr-str (read-people-from-file "resources/people.txt")))
 
@@ -464,28 +484,7 @@ fred
 
 
 ;; ---------------------------------------------------------------------------------------------------------------
-;; 10. Java Interop
-;;
-;; What am I learning?
-;;
-;; - Yes, you can still rely on well known / battle tested Java libraries.
-;;
-
-
-;; Special Syntax for creating a new instance...
-(def current-date (Date.))
-
-;; Method calling method starts with dot.
-(.getTime current-date)
-
-;; Static Method...
-(System/currentTimeMillis)
-
-(.toString (UUID/randomUUID))
-
-
-;; ---------------------------------------------------------------------------------------------------------------
-;; 11. But what if I do have some state.
+;; But what if I do have some state.
 ;;
 ;; In clojure one of the main mechanisms for managing state in a controlled way
 ;; is the "atom".
@@ -532,62 +531,7 @@ fred
 
 
 ;; ---------------------------------------------------------------------------------------------------------------
-;; 12. Polymorphism et al
-;;
-;; defmulti, defprotocol, defrecord, refify.
-;;
-;; What am I learning: You can still have polymorphic dispatch. But disconnected from Object hierarchies.
-;;
-
-(defmulti notification
-          (fn [account]
-            (if (> 0 (:balance account)) :overdrawn :normal)))
-
-(defmethod notification :overdrawn [account]
-  (format "Your account is overdrawn by %s." (:balance account)))
-
-(defmethod notification :normal [account]
-  (format "Greetings %s, welcome to TheBank!" (:name account)))
-
-(notification {:name    "John Smith"
-               :balance -123})
-
-
-;; defrecord / deftype / defprotcol
-
-(defprotocol Animal
-
-  (number-of-legs [animal])
-
-  (speak [animal]))
-
-(defrecord Dog [dog-tag owner] Animal
-
-  (number-of-legs [animal] 4)
-
-  (speak [animal] "Woof!"))
-
-(def a-dog (->Dog "12345" "John"))
-
-(speak a-dog)
-
-(def anonymous-animal
-
-  (reify Animal
-
-    (number-of-legs [animal] 436)
-
-    (speak [animal] "Bluurgen!")))
-
-(speak anonymous-animal)
-
-
-;; Learnings: Most relevant say where you might have a real database implementation,
-;; but wish to insert a Dummy implementation for unit / integration testing purposes.
-
-
-;; ---------------------------------------------------------------------------------------------------------------
-;; 13. Macros...
+;; >> Macros.
 ;;
 ;; Malleability of the language. You can easily extend the language if it suits.
 ;;
@@ -623,11 +567,29 @@ fred
 
 
 
-;; So what are the downsides...
+
+;; ---------------------------------------------------------------------------------------------------------------
+;; >> Java Interop
 ;;
-;; - Its different.
-;; - Good community - but smaller.
-;; - No dominant frameworks so can be a bit confusing as to what libraries to use.
-;; - Some styles of problems perhaps it doesn't suit.
-;; - No backed by a big corporate machine.
+;; What am I learning?
+;;
+;; - Yes, you can still rely on well known / battle tested Java libraries.
+;;
+
+
+;; Special Syntax for creating a new instance...
+(def current-date (Date.))
+
+;; Method calling method starts with dot.
+(.getTime current-date)
+
+;; Static Method...
+(System/currentTimeMillis)
+
+(.toString (UUID/randomUUID))
+
+
+;; ---------------------------------------------------------------------------------------------------------------
+;; So what are the downsides ?
+;;
 ;;
